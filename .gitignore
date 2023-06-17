@@ -1,0 +1,17 @@
+# Python-specific ignores
+__pycache__/
+venv/
+*.pyc
+
+# IDE-specific ignores
+.vscode/
+.idea/
+
+# Editor-specific ignores
+*.sublime-project
+*.sublime-workspace
+
+# Miscellaneous ignores
+*.log
+*.swp
+.DS_Store
