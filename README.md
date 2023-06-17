@@ -12,8 +12,6 @@ Sentiment Analysis API is a web service that analyzes the sentiment of text inpu
 
 ## Getting Started
 
-## Getting Started
-
 To get started with Sentiment Analysis API, make sure you have Python 3.9 or later installed on your system. You can check your Python version by running the following command:
 
 ```shell
