@@ -1,2 +1,3 @@
 flask
 setfit
+pydantic
