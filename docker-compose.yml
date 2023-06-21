@@ -1,0 +1,16 @@
+version: '3'
+services:
+  app:
+    image: flask:1.01
+    container_name: flask_container
+    build:
+      context: ./App
+      dockerfile: Dockerfile
+    working_dir: /app
+    volumes:
+      - ./App:/app
+      - ./App/static:/app/static
+      - ./App/templates:/app/templates
+    ports:
+      - "1111:1111"
+    command: gunicorn app:app --bind 0.0.0.0:1111
