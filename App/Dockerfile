@@ -1,12 +1,12 @@
-FROM python:3.9-buster AS builder
+FROM python:3.11-buster AS builder
 
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir setuptools mercurial --upgrade \
     && pip install --no-cache-dir -r /tmp/requirements.txt
 
-FROM python:3.9-slim-buster AS runner
+FROM python:3.11-slim-buster AS runner
 
-COPY --from=builder /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 
 RUN apt update \
     && apt upgrade -y \
