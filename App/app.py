@@ -38,8 +38,8 @@ def analyze_sentiment():
             sentiment = perform_sentiment_analysis(payload.text)
             response = SentimentAnalysisResponse(text=payload.text, sentiment=sentiment)
             return render_template(html_file, response=response, sentiment=sentiment)
-        except ValueError as e:
-            error_message = str(e)
+        except ValueError as error:
+            error_message = str(error)
             return render_template(html_file, error=error_message)
 
     return render_template(html_file)
