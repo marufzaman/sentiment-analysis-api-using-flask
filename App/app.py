@@ -28,7 +28,6 @@ def redirect_to_analyze():
     return redirect('/analyze')
 
 
-# Define a handler for the /analyze route, which accepts both GET and POST requests
 @app.route('/analyze', methods=['GET', 'POST'])
 def analyze_sentiment():
     html_file = 'index.html'

@@ -39,7 +39,6 @@ textarea {
     border: 1px solid #ccc;
     border-radius: 5px;
     resize: vertical;
-
 }
 
 button {
@@ -88,7 +87,6 @@ button:hover {
 .sentiment-neutral {
     color: #808080;
 }
-
 
 @media (max-width: 480px) {
     .container {

@@ -20,11 +20,11 @@
             <p class="error">{{ error }}</p>
         {% endif %}
 
-        {% if sentiment %}
+        {% if response %}
             <div class="result">
                 <h2>Analysis Result</h2>
-                <p><strong>Text:</strong> {{ text }}</p>
-                <p><strong>Sentiment:</strong> <span class="sentiment sentiment-{{ sentiment }}">{{ sentiment }}</span></p>
+                <p><strong>Text:</strong> {{ response.text }}</p>
+                <p><strong>Sentiment:</strong> <span class="sentiment sentiment-{{ response.sentiment }}">{{ response.sentiment }}</span></p>
             </div>
         {% endif %}
     </div>
