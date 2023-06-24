@@ -4,15 +4,12 @@ services:
     image: sentiment-analysis-with-flask:1.01
     container_name: sentiment-analysis-api
     build:
-      context: .
-      dockerfile: App/Dockerfile
-    working_dir: /app
-    volumes:
-      - ./App/app.py:/app/app.py
-      - ./App/requirements.txt:/app/requirements.txt
-      - ./App/custom-model:/app/custom-model
-      - ./App/static:/app/static
-      - ./App/templates:/app/templates
+      context: ./App
+      dockerfile: Dockerfile
     ports:
-      - "5000:5000"
-    command: gunicorn app:app --bind 0.0.0.0:5000
+      - 5000:5000
+    volumes:
+      - ./App/templates:/app/templates
+      - ./App/static:/app/static
+      - ./App/model-builder:/app/model-builder
+      - ./App/custom-model:/app/custom-model

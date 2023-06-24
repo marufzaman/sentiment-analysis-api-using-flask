@@ -1,38 +1,42 @@
-# Builder stage
-FROM python:3.11-alpine AS builder
+# Stage 1: Build stage
+FROM python:3.9-slim AS builder
 
+# Set working directory
 WORKDIR /app
 
-RUN apk update \
-    && apk add --no-cache --virtual .build-deps gcc g++ musl-dev libffi-dev openssl-dev python3-dev cargo
+# Copy the project files to the working directory
+COPY app.py /app
+COPY requirements.txt /app
 
-COPY App/requirements.txt .
+COPY custom-model /app/custom-model
+COPY model-builder /app/model-builder
+COPY static /app/static
+COPY templates /app/templates
 
-RUN python3 -m venv venv \
-    && /app/venv/bin/python -m pip install --no-cache-dir --upgrade pip \
-    && /app/venv/bin/python -m pip install --no-cache-dir numpy==1.23.2 \
-    && /app/venv/bin/python -m pip install --no-cache-dir -r requirements.txt
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Runner stage
-FROM python:3.11-alpine AS runner
+# Stage 2: Final stage
+FROM python:3.9-slim
 
+# Set working directory
 WORKDIR /app
 
-RUN apk update \
-    && apk add --no-cache libpq libxml2 \
-    && python3 -m venv venv
+# Copy the built dependencies from the builder stage
+COPY --from=builder /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
 
-COPY --from=builder /app/venv /app/venv
-COPY --from=builder /app/app.py /app/app.py
-COPY --from=builder /app/custom-model /app/custom-model
-COPY --from=builder /app/static /app/static
-COPY --from=builder /app/templates /app/templates
+# Install gunicorn
+RUN pip install gunicorn
 
-RUN apk add --no-cache glibc-dev libstdc++
+# Copy the project files to the working directory
+COPY app.py /app
+COPY custom-model /app/custom-model
+COPY model-builder /app/model-builder
+COPY static /app/static
+COPY templates /app/templates
 
-RUN pip install --no-cache-dir gunicorn==20.1.0
-
-# Set the entry point to activate the virtual environment and run the program
-ENTRYPOINT ["/app/venv/bin/python", "/app/app.py"]
-
+# Expose the port
 EXPOSE 5000
+
+# Set the entrypoint command to run the Flask app with gunicorn
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:5000"]
