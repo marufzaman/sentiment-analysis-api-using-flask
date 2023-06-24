@@ -1,10 +1,10 @@
-import torch
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from transformers import DistilBertForSequenceClassification, DistilBertTokenizer, AdamW
-from torch.utils.data import DataLoader, RandomSampler, SequentialSampler, SubsetRandomSampler
-from torch.optim.lr_scheduler import ReduceLROnPlateau
 import numpy as np
+import pandas as pd
+import torch
+from sklearn.model_selection import train_test_split
+from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch.utils.data import DataLoader, SequentialSampler, SubsetRandomSampler
+from transformers import DistilBertForSequenceClassification, DistilBertTokenizer, AdamW
 
 # Load the dataset
 df = pd.read_csv("sample_dataset.csv")
@@ -28,7 +28,7 @@ test_labels = [label_mapping[label] for label in test_labels]
 num_classes = len(label_mapping)
 
 # Load the pre-trained model and tokenizer
-model_name = 'distilbert-base-uncased'
+model_name = 'distilbert-base-uncased-distilled-squad'
 tokenizer = DistilBertTokenizer.from_pretrained(model_name)
 model = DistilBertForSequenceClassification.from_pretrained(model_name, num_labels=num_classes)
 
@@ -40,27 +40,21 @@ train_labels = [train_labels[i] for i in indices]
 
 # Tokenize and encode the training data
 train_encodings = tokenizer(list(train_texts), truncation=True, padding=True)
-train_dataset = torch.utils.data.TensorDataset(
-    torch.tensor(train_encodings["input_ids"]),
-    torch.tensor(train_encodings["attention_mask"]),
-    torch.tensor(train_labels)
-)
+train_dataset = torch.utils.data.TensorDataset(torch.tensor(train_encodings["input_ids"]),
+    torch.tensor(train_encodings["attention_mask"]), torch.tensor(train_labels))
 
 # Tokenize and encode the test data
 test_encodings = tokenizer(list(test_texts), truncation=True, padding=True)
-test_dataset = torch.utils.data.TensorDataset(
-    torch.tensor(test_encodings["input_ids"]),
-    torch.tensor(test_encodings["attention_mask"]),
-    torch.tensor(test_labels)
-)
+test_dataset = torch.utils.data.TensorDataset(torch.tensor(test_encodings["input_ids"]),
+    torch.tensor(test_encodings["attention_mask"]), torch.tensor(test_labels))
 
 # Fine-tuning parameters
 batch_size = 16
 learning_rate = 2e-5
 num_epochs = 3
 
-# Create data loaders
-train_sampler = SubsetRandomSampler(indices)
+# Create data loaders with the SubsetRandomSampler
+train_sampler = SubsetRandomSampler(range(len(train_dataset)))  # Use all the training data
 train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=train_sampler)
 test_loader = DataLoader(test_dataset, batch_size=batch_size, sampler=SequentialSampler(test_dataset))
 
@@ -99,7 +93,8 @@ for epoch in range(num_epochs):
         # Print batch progress
         if (batch_idx + 1) % 10 == 0 or (batch_idx + 1) == len(train_loader):
             progress = ((batch_idx + 1) / len(train_loader)) * 100
-            print(f"Epoch: {epoch + 1}, Batch: {batch_idx + 1}/{len(train_loader)}, Loss: {running_loss:.4f}, Progress: {progress:.2f}%")
+            print(
+                f"Epoch: {epoch + 1}, Batch: {batch_idx + 1}/{len(train_loader)}, Loss: {running_loss:.4f}, Progress: {progress:.2f}%")
 
     # Evaluate on the validation set
     model.eval()
@@ -142,11 +137,8 @@ best_model.to(device)
 
 # Tokenize and encode the test data
 test_encodings = tokenizer(list(test_texts), truncation=True, padding=True)
-test_dataset = torch.utils.data.TensorDataset(
-    torch.tensor(test_encodings["input_ids"]),
-    torch.tensor(test_encodings["attention_mask"]),
-    torch.tensor(test_labels)
-)
+test_dataset = torch.utils.data.TensorDataset(torch.tensor(test_encodings["input_ids"]),
+    torch.tensor(test_encodings["attention_mask"]), torch.tensor(test_labels))
 test_loader = DataLoader(test_dataset, batch_size=batch_size)
 
 # Evaluation
