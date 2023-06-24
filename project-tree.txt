@@ -1,0 +1,47 @@
+sentiment-analysis-api-using-flask:.
+│   .gitignore
+│   docker-compose.yml
+│   LICENSE
+│   README.md
+│
+└───App
+    │   app.py
+    │   Dockerfile
+    │   requirements.txt
+    │   test_app_unit.py
+    │
+    ├───custom-model
+    │   │   config.json
+    │   │   config_sentence_transformers.json
+    │   │   model_head.pkl
+    │   │   modules.json
+    │   │   sentence_bert_config.json
+    │   │   special_tokens_map.json
+    │   │   tokenizer.json
+    │   │   tokenizer_config.json
+    │   │   vocab.txt
+    │   │
+    │   └───1_Pooling
+    │           config.json
+    │
+    ├───dataset
+    │       sentiment-classification-unverified-BIG.csv
+    │       sentiment-classification.csv
+    │
+    ├───model-builder
+    │   │   model_requirements.txt
+    │   │   train_model_with_setfit.py
+    │   │
+    │   └───dataset
+    │           sentiment-classification-unverified-BIG.csv
+    │           sentiment-classification.csv
+    │
+    ├───models_builder
+    │       model_requirements.txt
+    │       with_setfit.py
+    │
+    ├───static
+    │       styles.css
+    │
+    └───templates
+            index.html
