@@ -4,11 +4,13 @@ services:
     image: sentiment-analysis-with-flask:1.01
     container_name: sentiment-analysis-api
     build:
-      context: ./App
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: App/Dockerfile
     working_dir: /app
     volumes:
-      - ./App:/app
+      - ./App/app.py:/app/app.py
+      - ./App/requirements.txt:/app/requirements.txt
+      - ./App/custom-model:/app/custom-model
       - ./App/static:/app/static
       - ./App/templates:/app/templates
     ports:

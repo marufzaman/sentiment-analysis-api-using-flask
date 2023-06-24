@@ -1,19 +1,38 @@
-FROM python:3.11-buster AS builder
+# Builder stage
+FROM python:3.11-alpine AS builder
 
-COPY requirements.txt /tmp/requirements.txt
-RUN pip install --no-cache-dir setuptools mercurial --upgrade \
-    && pip install --no-cache-dir -r /tmp/requirements.txt
+WORKDIR /app
 
-FROM python:3.11-slim-buster AS runner
+RUN apk update \
+    && apk add --no-cache --virtual .build-deps gcc g++ musl-dev libffi-dev openssl-dev python3-dev cargo
 
-COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY App/requirements.txt .
 
-RUN apt update \
-    && apt upgrade -y \
-    && apt install -y libpq5 libxml2 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /tmp/* \
-    && apt autoremove -y
+RUN python3 -m venv venv \
+    && /app/venv/bin/python -m pip install --no-cache-dir --upgrade pip \
+    && /app/venv/bin/python -m pip install --no-cache-dir numpy==1.23.2 \
+    && /app/venv/bin/python -m pip install --no-cache-dir -r requirements.txt
+
+# Runner stage
+FROM python:3.11-alpine AS runner
+
+WORKDIR /app
+
+RUN apk update \
+    && apk add --no-cache libpq libxml2 \
+    && python3 -m venv venv
+
+COPY --from=builder /app/venv /app/venv
+COPY --from=builder /app/app.py /app/app.py
+COPY --from=builder /app/custom-model /app/custom-model
+COPY --from=builder /app/static /app/static
+COPY --from=builder /app/templates /app/templates
+
+RUN apk add --no-cache glibc-dev libstdc++
 
 RUN pip install --no-cache-dir gunicorn==20.1.0
+
+# Set the entry point to activate the virtual environment and run the program
+ENTRYPOINT ["/app/venv/bin/python", "/app/app.py"]
+
+EXPOSE 5000
