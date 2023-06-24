@@ -2,6 +2,9 @@ import torch
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from transformers import DistilBertForSequenceClassification, DistilBertTokenizer, AdamW
+from torch.utils.data import DataLoader, RandomSampler, SequentialSampler, SubsetRandomSampler
+from torch.optim.lr_scheduler import ReduceLROnPlateau
+import numpy as np
 
 # Load the dataset
 df = pd.read_csv("sample_dataset.csv")
@@ -25,9 +28,15 @@ test_labels = [label_mapping[label] for label in test_labels]
 num_classes = len(label_mapping)
 
 # Load the pre-trained model and tokenizer
-model_name = 'distilbert-base-uncased'
+model_name = 'distilbert-base-uncased-distilled-squad'
 tokenizer = DistilBertTokenizer.from_pretrained(model_name)
 model = DistilBertForSequenceClassification.from_pretrained(model_name, num_labels=num_classes)
+
+# Data sampling
+sample_size = 5000  # Set the desired sample size
+indices = np.random.choice(len(train_texts), sample_size, replace=False)
+train_texts = train_texts[indices]
+train_labels = [train_labels[i] for i in indices]
 
 # Tokenize and encode the training data
 train_encodings = tokenizer(list(train_texts), truncation=True, padding=True)
@@ -51,15 +60,18 @@ learning_rate = 2e-5
 num_epochs = 3
 
 # Create data loaders
-train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size)
+train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=RandomSampler(train_dataset))
+test_loader = DataLoader(test_dataset, batch_size=batch_size, sampler=SequentialSampler(test_dataset))
 
 # Prepare optimizer and scheduler
-optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
+optimizer = AdamW(model.parameters(), lr=learning_rate)
+scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.1, patience=1, verbose=True)
 
 # Initialize variables to track the best model and its accuracy
 best_accuracy = 0.0
 best_model_path = None
+early_stop_counter = 0
+early_stop_patience = 2
 
 # Fine-tuning loop
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -68,7 +80,8 @@ model.train()
 
 # Inside the fine-tuning loop
 for epoch in range(num_epochs):
-    for batch in train_loader:
+    running_loss = 0.0
+    for batch_idx, batch in enumerate(train_loader):
         input_ids, attention_mask, labels = batch
         input_ids = input_ids.to(device)
         attention_mask = attention_mask.to(device)
@@ -79,6 +92,13 @@ for epoch in range(num_epochs):
         loss = outputs.loss
         loss.backward()
         optimizer.step()
+
+        running_loss += loss.item()
+
+        # Print batch progress
+        if (batch_idx + 1) % 10 == 0 or (batch_idx + 1) == len(train_loader):
+            progress = ((batch_idx + 1) / len(train_loader)) * 100
+            print(f"Epoch: {epoch + 1}, Batch: {batch_idx + 1}/{len(train_loader)}, Loss: {running_loss:.4f}, Progress: {progress:.2f}%")
 
     # Evaluate on the validation set
     model.eval()
@@ -100,17 +120,24 @@ for epoch in range(num_epochs):
     print("Epoch:", epoch + 1)
     print("Validation Accuracy:", accuracy)
 
-    # Save the best model if accuracy improves
+    # Learning rate scheduling
+    scheduler.step(accuracy)
+
+    # Early stopping
     if accuracy > best_accuracy:
         best_accuracy = accuracy
-        best_model_path = f"/Model/sentiment_accuracy_{accuracy:.4f}_on_epoch{epoch + 1}.pt"
-        model.save_pretrained(best_model_path)
+        best_model_path = f"sentiment_model_accuracy_{accuracy:.4f}_on_epoch{epoch + 1}.pt"
+        torch.save(model.state_dict(), best_model_path)
+        early_stop_counter = 0
+    else:
+        early_stop_counter += 1
+        if early_stop_counter >= early_stop_patience:
+            print(f"Early stopping at epoch {epoch + 1}")
+            break
 
 # Load the best model
 best_model = DistilBertForSequenceClassification.from_pretrained(best_model_path)
 best_model.to(device)
-
-# You can further fine-tune the best model if needed
 
 # Tokenize and encode the test data
 test_encodings = tokenizer(list(test_texts), truncation=True, padding=True)
@@ -126,7 +153,7 @@ best_model.eval()
 eval_accuracy = 0
 
 with torch.no_grad():
-    for batch in test_loader:
+    for batch_idx, batch in enumerate(test_loader):
         input_ids, attention_mask, labels = batch
         input_ids = input_ids.to(device)
         attention_mask = attention_mask.to(device)
@@ -137,5 +164,5 @@ with torch.no_grad():
         predictions = torch.argmax(logits, dim=1)
         eval_accuracy += torch.sum(predictions == labels).item()
 
-accuracy = eval_accuracy / len(test_texts)
-print("Best Model Accuracy:", accuracy)
+    accuracy = eval_accuracy / len(test_texts)
+    print("Best Model Accuracy:", accuracy)
