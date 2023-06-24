@@ -15,3 +15,5 @@ venv/
 *.log
 *.swp
 .DS_Store
+
+pytorch_model.bin
