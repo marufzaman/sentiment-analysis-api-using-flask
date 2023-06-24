@@ -2,3 +2,5 @@ scikit-learn==1.2.0
 datasets
 setfit
 sentence_transformers
+pyyaml
+pydantic

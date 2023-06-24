@@ -1,0 +1,9 @@
+csv_file_path: "dataset/sentiment-classification.csv"
+model_name: "StatsGary/setfit-ft-sentinent-eval"
+batch_size: 16
+num_iterations: 20
+num_epochs: 1
+column_mapping:
+  text: "text"
+  label: "label"
+save_path: "../custom-model"
