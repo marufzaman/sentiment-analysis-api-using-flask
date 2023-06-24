@@ -2,9 +2,10 @@ import numpy as np
 import pandas as pd
 import torch
 from sklearn.model_selection import train_test_split
-from torch.optim.lr_scheduler import ReduceLROnPlateau
-from torch.utils.data import DataLoader, SequentialSampler, SubsetRandomSampler
+from torch.optim.lr_scheduler import CosineAnnealingLR
+from torch.utils.data import DataLoader, SubsetRandomSampler
 from transformers import DistilBertForSequenceClassification, DistilBertTokenizer, AdamW
+from torch.cuda.amp import autocast, GradScaler
 
 # Load the dataset
 df = pd.read_csv("sample_dataset.csv")
@@ -40,27 +41,34 @@ train_labels = [train_labels[i] for i in indices]
 
 # Tokenize and encode the training data
 train_encodings = tokenizer(list(train_texts), truncation=True, padding=True)
-train_dataset = torch.utils.data.TensorDataset(torch.tensor(train_encodings["input_ids"]),
-    torch.tensor(train_encodings["attention_mask"]), torch.tensor(train_labels))
+train_dataset = torch.utils.data.TensorDataset(
+    torch.tensor(train_encodings["input_ids"]),
+    torch.tensor(train_encodings["attention_mask"]),
+    torch.tensor(train_labels)
+)
 
 # Tokenize and encode the test data
 test_encodings = tokenizer(list(test_texts), truncation=True, padding=True)
-test_dataset = torch.utils.data.TensorDataset(torch.tensor(test_encodings["input_ids"]),
-    torch.tensor(test_encodings["attention_mask"]), torch.tensor(test_labels))
+test_dataset = torch.utils.data.TensorDataset(
+    torch.tensor(test_encodings["input_ids"]),
+    torch.tensor(test_encodings["attention_mask"]),
+    torch.tensor(test_labels)
+)
 
 # Fine-tuning parameters
 batch_size = 16
 learning_rate = 2e-5
 num_epochs = 3
+gradient_accumulation_steps = 4  # Accumulate gradients over 4 batches
 
 # Create data loaders with the SubsetRandomSampler
 train_sampler = SubsetRandomSampler(range(len(train_dataset)))  # Use all the training data
-train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=train_sampler)
-test_loader = DataLoader(test_dataset, batch_size=batch_size, sampler=SequentialSampler(test_dataset))
+train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=train_sampler, num_workers=4)
+test_loader = DataLoader(test_dataset, batch_size=batch_size)
 
 # Prepare optimizer and scheduler
 optimizer = AdamW(model.parameters(), lr=learning_rate)
-scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.1, patience=1, verbose=True)
+scheduler = CosineAnnealingLR(optimizer, T_max=num_epochs * len(train_loader))
 
 # Initialize variables to track the best model and its accuracy
 best_accuracy = 0.0
@@ -73,6 +81,8 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 model.train()
 
+scaler = GradScaler()  # Mixed precision training scaler
+
 # Inside the fine-tuning loop
 for epoch in range(num_epochs):
     running_loss = 0.0
@@ -83,18 +93,24 @@ for epoch in range(num_epochs):
         labels = torch.nn.functional.one_hot(labels.to(torch.int64), num_classes).float().to(device)
 
         optimizer.zero_grad()
-        outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
-        loss = outputs.loss
-        loss.backward()
-        optimizer.step()
+
+        with autocast():  # Automatic mixed precision training
+            outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
+            loss = outputs.loss
+
+        scaler.scale(loss).backward()
+
+        if (batch_idx + 1) % gradient_accumulation_steps == 0:
+            scaler.step(optimizer)
+            scaler.update()
+            scheduler.step()
 
         running_loss += loss.item()
 
         # Print batch progress
         if (batch_idx + 1) % 10 == 0 or (batch_idx + 1) == len(train_loader):
             progress = ((batch_idx + 1) / len(train_loader)) * 100
-            print(
-                f"Epoch: {epoch + 1}, Batch: {batch_idx + 1}/{len(train_loader)}, Loss: {running_loss:.4f}, Progress: {progress:.2f}%")
+            print(f"Epoch: {epoch + 1}, Batch: {batch_idx + 1}/{len(train_loader)}, Loss: {running_loss:.4f}, Progress: {progress:.2f}%")
 
     # Evaluate on the validation set
     model.eval()
@@ -116,9 +132,6 @@ for epoch in range(num_epochs):
     print("Epoch:", epoch + 1)
     print("Validation Accuracy:", accuracy)
 
-    # Learning rate scheduling
-    scheduler.step(accuracy)
-
     # Early stopping
     if accuracy > best_accuracy:
         best_accuracy = accuracy
@@ -137,8 +150,11 @@ best_model.to(device)
 
 # Tokenize and encode the test data
 test_encodings = tokenizer(list(test_texts), truncation=True, padding=True)
-test_dataset = torch.utils.data.TensorDataset(torch.tensor(test_encodings["input_ids"]),
-    torch.tensor(test_encodings["attention_mask"]), torch.tensor(test_labels))
+test_dataset = torch.utils.data.TensorDataset(
+    torch.tensor(test_encodings["input_ids"]),
+    torch.tensor(test_encodings["attention_mask"]),
+    torch.tensor(test_labels)
+)
 test_loader = DataLoader(test_dataset, batch_size=batch_size)
 
 # Evaluation
