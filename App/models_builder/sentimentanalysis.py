@@ -8,7 +8,7 @@ from transformers import DistilBertForSequenceClassification, DistilBertTokenize
 from torch.cuda.amp import autocast, GradScaler
 
 # Load the dataset
-df = pd.read_csv("sample_dataset.csv")
+df = pd.read_csv("../dataset/sentiment-classification-unverified-BIG.csv")
 
 # Split the dataset into train and test sets
 train_texts, test_texts, train_labels, test_labels = train_test_split(
