@@ -5,7 +5,7 @@ from setfit import SetFitModel
 app = Flask(__name__)
 
 # Load the pre-trained sentiment model
-model = SetFitModel.from_pretrained("StatsGary/setfit-ft-sentinent-eval")
+model = SetFitModel.from_pretrained("custom-model")
 
 
 class SentimentAnalysisRequest(BaseModel):
@@ -59,7 +59,7 @@ def perform_sentiment_analysis(text):
 
 # Map sentiment values to labels
 def map_sentiment_to_label(sentiment):
-    labels = ["negative", "positive", "neutral"]
+    labels = ["negative", "neutral", "positive"]
     return labels[sentiment]
 
 
