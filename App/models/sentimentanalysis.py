@@ -28,7 +28,7 @@ test_labels = [label_mapping[label] for label in test_labels]
 num_classes = len(label_mapping)
 
 # Load the pre-trained model and tokenizer
-model_name = 'distilbert-base-uncased-distilled-squad'
+model_name = 'distilbert-base-uncased'
 tokenizer = DistilBertTokenizer.from_pretrained(model_name)
 model = DistilBertForSequenceClassification.from_pretrained(model_name, num_labels=num_classes)
 
@@ -60,7 +60,8 @@ learning_rate = 2e-5
 num_epochs = 3
 
 # Create data loaders
-train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=RandomSampler(train_dataset))
+train_sampler = SubsetRandomSampler(indices)
+train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=train_sampler)
 test_loader = DataLoader(test_dataset, batch_size=batch_size, sampler=SequentialSampler(test_dataset))
 
 # Prepare optimizer and scheduler
@@ -146,14 +147,14 @@ test_dataset = torch.utils.data.TensorDataset(
     torch.tensor(test_encodings["attention_mask"]),
     torch.tensor(test_labels)
 )
-test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size)
+test_loader = DataLoader(test_dataset, batch_size=batch_size)
 
 # Evaluation
 best_model.eval()
 eval_accuracy = 0
 
 with torch.no_grad():
-    for batch_idx, batch in enumerate(test_loader):
+    for batch in test_loader:
         input_ids, attention_mask, labels = batch
         input_ids = input_ids.to(device)
         attention_mask = attention_mask.to(device)
