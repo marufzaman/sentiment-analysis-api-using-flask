@@ -23,15 +23,15 @@ print("Data converted to Datasets.")
 
 # Encode categorical labels
 label_encoder = LabelEncoder()
-train_dataset = train_dataset.map(lambda example: {"label": label_encoder.fit_transform([example["label"]])[0]},
-                                  batched=True)
-eval_dataset = eval_dataset.map(lambda example: {"label": label_encoder.transform([example["label"]])[0]}, batched=True)
+train_dataset = train_dataset.map(lambda example: {"label": label_encoder.fit_transform(example["label"])}, batched=True)
+eval_dataset = eval_dataset.map(lambda example: {"label": label_encoder.transform(example["label"])}, batched=True)
 print("Labels encoded with label encoder.")
 
 # Load a SetFit model from the Hugging Face Hub
 model = SetFitModel.from_pretrained("StatsGary/setfit-ft-sentinent-eval")
 print("SetFit model loaded from the Hugging Face Hub.")
 
+#See dataset columns
 print("Dataset columns:", train_dataset.column_names)
 
 # Create the trainer
