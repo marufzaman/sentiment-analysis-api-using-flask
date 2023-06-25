@@ -17,4 +17,4 @@ venv/
 .DS_Store
 
 pytorch_model.bin
-/App/custom-model/custom-model.zip
+custom-model.zip
