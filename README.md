@@ -70,13 +70,13 @@ environment:
 - ##### On a Windows-based system:
 
 ```shell
-pip install --no-cache-dir -r requirements.txt
+pip install --no-cache-dir -r ./App/requirements.txt
 ```
 
 - ##### On a Linux or macOS-based system:
 
 ```shell
-pip3 install --no-cache-dir -r requirements.txt
+pip3 install --no-cache-dir -r ./App/requirements.txt
 ```
 
 **Note:** Here, `--no-cache-dir` is used to avoid cache dir for the pip installation.
