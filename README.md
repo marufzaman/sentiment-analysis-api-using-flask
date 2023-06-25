@@ -34,7 +34,7 @@ with the Sentiment Analysis API.
 **Note:** Please after cloning the repository, go inside the `sentiment-analysis-api-using-flask/` directory.
 
 **2.** Download the fine-tuned model
-from [here](https://drive.google.com/file/d/1GU55SpGh3TzlqrvkmvqEGPDBuSLdYMlu/view?usp=sharing) and put it in
+from [here](https://drive.google.com/file/d/1GU55SpGh3TzlqrvkmvqEGPDBuSLdYMlu) and put it in
 the `./App/custom-model` directory.
 
 **3.** Install the dependencies using pip inside the project directory and make sure you are using a virtual
