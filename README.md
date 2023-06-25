@@ -124,7 +124,7 @@ command:
 docker --version
 ```
 
-###### If you don't have Docker installed, you can download and install it from the official [Docker](https://www.docker.com/) website.
+##### If you don't have Docker installed, you can download and install it from the official [Docker](https://www.docker.com/) website.
 
 **2.** Build the Docker image by running the following command in the project directory:
 
@@ -132,10 +132,11 @@ docker --version
 docker-compose -f docker-compose.yml up -d
 ```
 
-###### This command will build a Docker image and run the container on the `5000:5000` port.
+##### This command will build a Docker image and run the container on the `5000:5000` port.
 
 **3.** Send a POST request to `http://localhost:5000/analyze` with a JSON payload as described in the "Getting Started"
 section of this README.
+
 **4.** Receive a JSON response with the sentiment analysis result.
 
 ## Front-end Application
@@ -209,6 +210,24 @@ python3 -m venv venv && source venv/bin/activate && pip3 install --no-cache-dir 
 
 **Note**: The given commands onward will create a virtual environment, activate it if it does not already exist in the
 root directory, and install the necessary libraries from the `./App/model-builder/model_requirements.txt` file.
+
+- Then you can run the `./App/model-builder/train_model_with_setfit.py` script to generate the `custom-model` in the
+  `./App/custom-model/` directory.
+
+- ##### On a Windows-based system:
+
+```shell
+python ./App/model-builder/train_model_with_setfit.py
+```
+
+- ##### On a Linux or macOS-based system:
+
+```shell
+python3 ./App/model-builder/train_model_with_setfit.py
+```
+
+**Note**: The `./App/model-builder/train_model_with_setfit.py` script will generate the `custom-model` in the
+`./App/custom-model/` directory.
 
 ## Unit Testing
 
