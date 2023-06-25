@@ -55,7 +55,7 @@ the `./App/custom-model` directory.
 - ##### On a Windows-based system:
 
 ```shell
-python -m venv venv && venv/bin/activate
+python -m venv venv && venv\Scripts\activate
 ```
 
 - ##### On a Linux or macOS-based system:
@@ -199,7 +199,7 @@ cd ./sentiment-analysis-api-using-flask/
 - ##### On a Windows-based system:
 
 ```shell
-python -m venv venv && venv/bin/activate && pip install --no-cache-dir -r ./App/model-builder/model_requirements.txt
+python -m venv venv && venv\Scripts\activate && pip install --no-cache-dir -r ./App/model-builder/model_requirements.txt
 ```
 
 - ##### On a Linux or macOS-based system:
