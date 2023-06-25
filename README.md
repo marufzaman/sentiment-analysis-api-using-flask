@@ -14,13 +14,13 @@ The Sentiment Analysis API is a web service that analyzes the sentiment of text 
 
 To get started with the Sentiment Analysis API, make sure you have Python 3.9 or later installed on your system. You can check your Python version by running the following command:
 
-- ###### On a Windows-based system:
+- ##### On a Windows-based system:
 
 ```shell
 python --version
 ```
 
-- ###### On a Linux or macOS-based system:
+- ##### On a Linux or macOS-based system:
 
 ```shell
 python3 --version
@@ -42,13 +42,13 @@ git clone https://github.com/marufzaman/sentiment-analysis-api-using-flask.git
 cd ./sentiment-analysis-api-using-flask/
 ```
 
-- ###### On a Windows-based system:
+- ##### On a Windows-based system:
 
 ```shell
 python -m venv venv && venv/bin/activate
 ```
 
-- ###### On a Linux or macOS-based system:
+- ##### On a Linux or macOS-based system:
 
 ```shell
 python3 -m venv venv && source venv/bin/activate
@@ -56,13 +56,13 @@ python3 -m venv venv && source venv/bin/activate
 
 **3.** Install the dependencies using pip inside the project directory and make sure you are using a virtual environment:
 
-- ###### On a Windows-based system:
+- ##### On a Windows-based system:
 
 ```shell
 pip install --no-cache-dir -r requirements.txt
 ```
 
-- ###### On a Linux or macOS-based system:
+- ##### On a Linux or macOS-based system:
 
 ```shell
 pip3 install --no-cache-dir -r requirements.txt
@@ -71,13 +71,13 @@ pip3 install --no-cache-dir -r requirements.txt
 **4.** Start the API server:
 From the root directory: sentiment-analysis-api-using-flask/.
 
-- ###### On a Windows-based system:
+- ##### On a Windows-based system:
 
 ```shell
 python ./App/app.py
 ```
 
-- ###### On a Linux or macOS-based system:
+- ##### On a Linux or macOS-based system:
 
 ```shell
 python3 ./App/app.py
@@ -130,13 +130,13 @@ To run the front-end application, follow these steps:
 
 **1.** Start the API server by running the following command in your terminal:
 
-- ###### On a Windows-based system:
+- ##### On a Windows-based system:
 
 ```shell
 python ./App/app.py
 ```
 
-- ###### On a Linux or macOS-based system:
+- ##### On a Linux or macOS-based system:
 
 ```shell
 python3 ./App/app.py
@@ -171,32 +171,32 @@ The sentiment analysis functionality in this API is powered by a fine-tuned cust
 cd ./sentiment-analysis-api-using-flask/
 ```
 
-- ###### On a Windows-based system:
+- ##### On a Windows-based system:
 
 ```shell
 python -m venv venv && venv/bin/activate && pip install --no-cache-dir -r ./App/model-builder/model_requirements.txt
 ```
 
-- ###### On a Linux or macOS-based system:
+- ##### On a Linux or macOS-based system:
 
 ```shell
 python3 -m venv venv && source venv/bin/activate && pip3 install --no-cache-dir -r ./App/model-builder/model_requirements.txt
 ```
 
-###### The given commands onward will create a virtual environment, activate it if it does not already exist in the root directory, and install the necessary libraries from the `./App/model-builder/model_requirements.txt` file.
+**Note**: The given commands onward will create a virtual environment, activate it if it does not already exist in the root directory, and install the necessary libraries from the `./App/model-builder/model_requirements.txt` file.
 
 ## Unit Testing
 Additionally, you can run the unit tests for the API by running the following command in the root directory:
 
 From the root directory: sentiment-analysis-api-using-flask/.
 
-- ###### On a Windows-based system:
+- ##### On a Windows-based system:
 
 ```shell
 python ./App/test_app_unit.py
 ```
 
-- ###### On a Linux or macOS-based system:
+- ##### On a Linux or macOS-based system:
 
 ```shell
 python3 ./App/test_app_unit.py
