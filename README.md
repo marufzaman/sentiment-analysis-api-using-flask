@@ -117,7 +117,7 @@ pip3 install --no-cache-dir -r ./App/requirements.txt
 
 > :memo: **Note:** Here, `--no-cache-dir` is used to avoid cache dir for the pip installation.
 
-**4.** Start the API server:
+**5.** Start the API server:
 Execute the following command from the root directory: `sentiment-analysis-api-using-flask/.`
 
 - ##### On a Windows-based system:
@@ -132,7 +132,7 @@ python ./App/app.py
 python3 ./App/app.py
 ```
 
-**5.** Send a POST request to `http://localhost:5000/analyze` with a JSON payload:
+**6.** Send a POST request to `http://localhost:5000/analyze` with a JSON payload:
 
 ```json
 {
@@ -140,7 +140,7 @@ python3 ./App/app.py
 }
 ```
 
-**6.** Receive a JSON response with the sentiment analysis result:
+**7.** Receive a JSON response with the sentiment analysis result:
 
 ```json
 {
