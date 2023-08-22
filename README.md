@@ -85,7 +85,7 @@ sentiment-analysis-api-using-flask/.
 
 > :microscope: From the git clone, the <ins>`sentiment-analysis-api-using-flask/App/custom-model/pytorch_model.bin`</ins> will be missing. The File size is too big for GitHub repository! On the Next point **2.** you will be instructed what to do.
 
-**2.** If any of the files from the directory is missing (For git clone, the <ins>`sentiment-analysis-api-using-flask/App/custom-model/pytorch_model.bin`</ins> will be missing.), please download the `custom-model.zip` file from the following [_link_](https://drive.google.com/file/d/1GU55SpGh3TzlqrvkmvqEGPDBuSLdYMlu) and extract downloaded `custom-model.zip` to put and replace all of it's contents in the `./App/custom-model` directory. _In the future, I am going to make the checking, downloading and replacing aytomatic._
+**2.** If any of the files from the directory is missing (For git clone, the <ins>`sentiment-analysis-api-using-flask/App/custom-model/pytorch_model.bin`</ins> will be missing.), please download the `custom-model.zip` file from the following [_link_](https://drive.google.com/file/d/1GU55SpGh3TzlqrvkmvqEGPDBuSLdYMlu) and extract downloaded `custom-model.zip` to put and replace all of it's contents in the `./App/custom-model` directory. _In the future, I am going to make the checking, downloading and replacing automatic._
 
 **3.** Create and activate a virtual environment inside the project directory:
 
