@@ -4,8 +4,6 @@ services:
     build:
       context: ./App
       dockerfile: Dockerfile
-      args:
-        - DOWNLOAD_OPTION=--download
     ports:
       - "5000:5000"
     volumes:

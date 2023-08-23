@@ -7,16 +7,23 @@ WORKDIR /app
 # Copy the project files to the working directory
 COPY app.py /app
 COPY requirements.txt /app
-COPY model_downloader.py /app
 COPY model-builder /app/model-builder
 COPY static /app/static
 COPY templates /app/templates
 
+# Remove existing dependencies
+RUN pip install pip --upgrade
+RUN pip freeze > existing.txt
+# Check if the existing.txt file exists and is not empty before attempting to uninstall packages
+RUN if [ -s existing.txt ]; then pip uninstall -y -r existing.txt; fi
+RUN rm -rf existing.txt
 # Install dependencies
+RUN pip install pip --upgrade
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r model-builder/requirements.txt
 
 # Stage 2: Final stage
-FROM python:3.9-slim
+FROM python:3.9-slim AS production
 
 # Set working directory
 WORKDIR /app
