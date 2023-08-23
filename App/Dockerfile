@@ -15,9 +15,6 @@ COPY templates /app/templates
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Run the model downloader to check and download the model files
-RUN python model_downloader.py --download
-
 # Stage 2: Final stage
 FROM python:3.9-slim
 
