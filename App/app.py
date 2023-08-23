@@ -4,12 +4,22 @@ from flask import Flask, redirect, render_template, request
 from pydantic import BaseModel, validator
 from setfit import SetFitModel
 
+from model_downloader import download_model_files, ModelDownloadError
+
 app = Flask(__name__)
 
 # Get the directory of the currently executing script
 current_script_dir = os.path.dirname(os.path.abspath(__file__))
 custom_model = "custom-model"
 model_directory = os.path.join(current_script_dir, custom_model)
+
+try:
+    # Check and download the model files/directory if needed
+    download_model_files(custom_model)
+except ModelDownloadError as e:
+    print(e)
+    exit(1)
+
 # Load the pre-trained sentiment model
 model = SetFitModel.from_pretrained(model_directory)
 
