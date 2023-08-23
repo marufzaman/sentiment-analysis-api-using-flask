@@ -1,5 +1,5 @@
-from flask import Flask, request, render_template, redirect
-from pydantic import BaseModel, validator
+from flask import Flask, redirect, render_template, request
+from pydantic import BaseModel, ValidationError, validator
 from setfit import SetFitModel
 
 app = Flask(__name__)
@@ -8,6 +8,14 @@ model_directory = "./App/custom-model"
 
 # Load the pre-trained sentiment model
 model = SetFitModel.from_pretrained(model_directory)
+
+
+# Validate the request payload using Pydantic model
+def validate_request(data):
+    try:
+        SentimentAnalysisRequest(**data)
+    except ValidationError as e:
+        raise ValueError(str(e)) from e
 
 
 class SentimentAnalysisRequest(BaseModel):
