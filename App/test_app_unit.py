@@ -1,7 +1,6 @@
 import unittest
 
-from app import (map_sentiment_to_label, perform_sentiment_analysis,
-                 validate_request)
+from app import (map_sentiment_to_label, perform_sentiment_analysis, validate_request)
 
 
 class SentimentAnalysisTests(unittest.TestCase):
@@ -13,11 +12,6 @@ class SentimentAnalysisTests(unittest.TestCase):
         data = {}
         with self.assertRaises(ValueError):
             validate_request(data)
-
-    # def test_validate_request_invalid_text(self):
-    #     data = {"text": 123}
-    #     with self.assertRaises(ValueError):
-    #         validate_request(data)
 
     def test_perform_sentiment_analysis(self):
         text = "This is a positive sentence."

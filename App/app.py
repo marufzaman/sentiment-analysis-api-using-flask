@@ -1,36 +1,33 @@
+import os
+
 from flask import Flask, redirect, render_template, request
-from pydantic import BaseModel, ValidationError, validator
+from pydantic import BaseModel, validator
 from setfit import SetFitModel
 
 app = Flask(__name__)
 
-model_directory = "./App/custom-model"
-
+# Get the directory of the currently executing script
+current_script_dir = os.path.dirname(os.path.abspath(__file__))
+custom_model = "custom-model"
+model_directory = os.path.join(current_script_dir, custom_model)
 # Load the pre-trained sentiment model
 model = SetFitModel.from_pretrained(model_directory)
-
-
-# Validate the request payload using Pydantic model
-def validate_request(data):
-    try:
-        SentimentAnalysisRequest(**data)
-    except ValidationError as e:
-        raise ValueError(str(e)) from e
 
 
 class SentimentAnalysisRequest(BaseModel):
     """
     Represents the request payload for sentiment analysis.
+    And all input will be converted as string.
     """
     text: str
 
     @validator('text')
-    def text_must_not_be_empty(cls, value):
+    def text_must_be_non_empty_string(cls, value):
         """
-        Validator to ensure the 'text' field is not empty.
+        Validator to ensure the 'text' field is a non-empty string.
         """
-        if not value.strip():
-            raise ValueError('Invalid input: "text" must not be empty')
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError('Invalid input: "text" must be a non-empty string')
         return value
 
 
@@ -67,6 +64,11 @@ def analyze_sentiment():
             return render_template(html_file, error=error_message)
 
     return render_template(html_file)
+
+
+# Validate the request payload using Pydantic model
+def validate_request(data):
+    SentimentAnalysisRequest(**data)
 
 
 def perform_sentiment_analysis(text):
