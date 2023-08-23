@@ -237,8 +237,7 @@ def load_config(config_file):
     """
     try:
         with open(config_file, "r") as file:
-            config = yaml.safe_load(file)
-            return config
+            return yaml.safe_load(file)
     except FileNotFoundError as e:
         raise FileNotFoundError("Configuration file not found.") from e
     except yaml.YAMLError as e:
