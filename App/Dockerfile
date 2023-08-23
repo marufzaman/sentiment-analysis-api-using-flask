@@ -20,7 +20,6 @@ RUN rm -rf existing.txt
 # Install dependencies
 RUN pip install pip --upgrade
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir -r model-builder/requirements.txt
 
 # Stage 2: Final stage
 FROM python:3.9-slim AS production
