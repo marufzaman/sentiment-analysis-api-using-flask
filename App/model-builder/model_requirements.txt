@@ -1,6 +1,6 @@
 scikit-learn==1.2.0
 datasets
-setfit
+setfit==0.7.0
 sentence_transformers
 pyyaml
 pydantic
